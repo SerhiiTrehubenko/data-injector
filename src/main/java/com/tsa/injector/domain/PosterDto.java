@@ -3,12 +3,21 @@ package com.tsa.injector.domain;
 import java.util.Objects;
 
 public class PosterDto {
+    private int movieId;
     private String movieRusName;
     private String posterLink;
 
     public boolean isFull() {
         return Objects.nonNull(movieRusName) &&
                 Objects.nonNull(posterLink);
+    }
+
+    public int getMovieId() {
+        return movieId;
+    }
+
+    public void setMovieId(int movieId) {
+        this.movieId = movieId;
     }
 
     public String getMovieRusName() {

@@ -3,6 +3,8 @@ package com.tsa.injector.domain;
 import java.util.Objects;
 
 public class ReviewDto {
+    private int movieId;
+    private int userId;
     private String movieRusName;
     private String userFirstName;
     private String userLastName;
@@ -13,6 +15,22 @@ public class ReviewDto {
                 Objects.nonNull(userFirstName) &&
                 Objects.nonNull(userLastName) &&
                 Objects.nonNull(comment);
+    }
+
+    public int getMovieId() {
+        return movieId;
+    }
+
+    public void setMovieId(int movieId) {
+        this.movieId = movieId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getMovieRusName() {

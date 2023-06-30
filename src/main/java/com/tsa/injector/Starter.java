@@ -6,14 +6,18 @@ import com.tsa.injector.argsparser.impl.DefaultPropertyReader;
 import com.tsa.injector.argsparser.interfaces.AppArgsPropertyContext;
 import com.tsa.injector.argsparser.interfaces.ArgsParser;
 import com.tsa.injector.argsparser.interfaces.PropertyReader;
+import com.tsa.injector.dao.*;
 import com.tsa.injector.database.DbConnector;
 import com.tsa.injector.database.DbConnectorImpl;
-import com.tsa.injector.domain.DefaultProperty;
+import com.tsa.injector.datainjector.DataInjector;
+import com.tsa.injector.datainjector.DataInjectorImpl;
+import com.tsa.injector.dataparser.*;
+import com.tsa.injector.domain.*;
 import com.tsa.injector.file.FileFetcher;
+import com.tsa.injector.file.FileHolder;
+import com.tsa.injector.file.FileHolderImpl;
 import com.tsa.injector.file.TxtFileFetcher;
-
-import java.sql.Connection;
-import java.sql.SQLException;
+import com.tsa.injector.service.*;
 
 public class Starter {
     public static void main(String[] args) {
@@ -23,18 +27,30 @@ public class Starter {
         argsParser.parse(args);
 
         AppArgsPropertyContext configuredContext = argsParser.getContext();
+
+//        Property Reader
         PropertyReader propertyReader = new DefaultPropertyReader(configuredContext);
 
 //        DB Connection
         DbConnector connector = new DbConnectorImpl(propertyReader);
-        try (Connection connection = connector.getConnection()) {
-            System.out.println(!connection.isClosed());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
 
 //        Data Files Fetch
         String pathDataFiles = propertyReader.getPathDataFiles();
         FileFetcher fileFetcher = new TxtFileFetcher(pathDataFiles);
+        FileHolder filesHolder = new FileHolderImpl(fileFetcher.getFiles());
+
+//        Parsers
+        ParserFactory parserFactory = new ParserFactoryImpl();
+
+//        DAO
+        DaoFactory daoFactory = new DaoFactoryImpl(connector);
+
+//        Services
+        ServiceFactory serviceFactory = new ServiceFactoryImpl(daoFactory);
+
+//        MAIN Data Injector Handler
+        DataInjector dataInjector = new DataInjectorImpl(filesHolder, parserFactory, serviceFactory);
+        dataInjector.inject();
+        System.out.println("Injection processed Successfully");
     }
 }
